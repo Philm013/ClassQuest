@@ -348,12 +348,15 @@ h4 {
 .tab-row {
   overflow-x: auto;
   padding-bottom: 6px;
+  scroll-snap-type: x proximity;
 }
 
 .tab-pill {
   border: 1px solid rgba(148, 163, 184, 0.14);
   background: rgba(15, 23, 42, 0.42);
   white-space: nowrap;
+  scroll-snap-align: start;
+  min-height: 44px;
 }
 
 .tab-pill.active {
@@ -532,6 +535,11 @@ input:focus {
   border-radius: 16px;
   background: rgba(15, 23, 42, 0.46);
   border: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.list-row {
+  width: 100%;
+  text-align: left;
 }
 
 .leaderboard-row.highlight {
@@ -914,6 +922,12 @@ input:focus {
   .topbar {
     padding: 16px;
     top: 10px;
+    align-items: flex-start;
+  }
+
+  .topbar-actions {
+    width: 100%;
+    justify-content: space-between;
   }
 
   .hero,
@@ -949,5 +963,31 @@ input:focus {
   .info-banner {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .button-row .primary-button,
+  .button-row .secondary-button,
+  .button-row .ghost-button,
+  .button-row .danger-button {
+    width: 100%;
+  }
+
+  .tab-pill {
+    padding: 10px 12px;
+  }
+
+  .code-display {
+    width: 100%;
+    justify-content: center;
+  }
+
+  #toast-region {
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+  }
+
+  .toast {
+    min-width: 0;
   }
 }

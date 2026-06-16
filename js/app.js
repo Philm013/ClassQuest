@@ -41,18 +41,18 @@ function renderLanding() {
   appRoot.innerHTML = `
     <section class="hero">
       <div>
-        <p class="eyebrow">Static SPA · Peer-to-peer · GitHub Pages ready</p>
-        <h2>Turn classroom management into a team-powered quest.</h2>
-        <p>ClassQuest gives teachers a browser-based host dashboard, students a live progress center, and both sides resilient local storage with PeerJS + demo-mode syncing.</p>
+        <p class="eyebrow">Welcome to ClassQuest</p>
+        <h2>Make everyday class progress feel like a shared adventure.</h2>
+        <p>Teachers can run class routines with less friction, and students can follow goals, celebrate wins, and stay motivated from any device.</p>
         <div class="hero-actions">
           <button class="primary-button" id="open-teacher" type="button">I'm a Teacher</button>
           <button class="secondary-button" id="open-student" type="button">I'm a Student</button>
         </div>
       </div>
       <div class="hero-panel">
-        <div class="hero-stat"><span>Teacher toolkit</span><strong>Sessions, roster, behavior, assignments, goals, settings</strong></div>
-        <div class="hero-stat"><span>Student toolkit</span><strong>Dashboard, badges, leaderboard, avatar customization</strong></div>
-        <div class="hero-stat"><span>Tech stack</span><strong>Vanilla ES modules, IndexedDB, localStorage, PeerJS, BroadcastChannel</strong></div>
+        <div class="hero-stat"><span>Teacher workflow</span><strong>Create class sessions, guide behavior, and review assignments in one place.</strong></div>
+        <div class="hero-stat"><span>Student experience</span><strong>Track XP, build streaks, unlock badges, and personalize your avatar.</strong></div>
+        <div class="hero-stat"><span>Built for classrooms</span><strong>Fast setup, local recovery, and live updates during class time.</strong></div>
       </div>
     </section>
   `;

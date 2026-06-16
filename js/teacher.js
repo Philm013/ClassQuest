@@ -244,16 +244,16 @@ export class TeacherApp {
         <div class="hero">
           <div>
             <p class="eyebrow">Teacher mode</p>
-            <h2>Launch a classroom adventure in minutes.</h2>
-            <p>Host the authoritative ClassQuest session directly in your browser, admit students live, and keep a resilient local snapshot every 30 seconds.</p>
+            <h2>Set up a class quest in minutes.</h2>
+            <p>Start class quickly, admit students with one click, and keep progress organized with a simple classroom command center.</p>
             <div class="hero-actions">
               <button class="primary-button" type="button" data-action="demo-teacher">Open demo dashboard</button>
             </div>
           </div>
           <div class="hero-panel">
-            <div class="hero-stat"><span>Connection</span><strong>PeerJS + IndexedDB + demo fallback</strong></div>
-            <div class="hero-stat"><span>Recovery</span><strong>Restore from local snapshots or import backup JSON</strong></div>
-            <div class="hero-stat"><span>Authority</span><strong>Teacher validates intents and broadcasts deltas</strong></div>
+            <div class="hero-stat"><span>Class control</span><strong>Manage attendance, behavior, assignments, and goals from one place.</strong></div>
+            <div class="hero-stat"><span>Reliable sessions</span><strong>Resume from saved sessions or import a class backup.</strong></div>
+            <div class="hero-stat"><span>Real-time classroom</span><strong>Approve joins and push updates instantly to students.</strong></div>
           </div>
         </div>
         <div class="dashboard two-col">
@@ -276,7 +276,7 @@ export class TeacherApp {
                 <button class="ghost-button" type="button" data-action="import-session">Import Backup</button>
                 <button class="danger-button" type="button" data-action="recover-db">Recover DB</button>
               </div>
-              <p class="footer-note">Use recovery if IndexedDB data is corrupted. Import accepts a JSON backup exported from the Session tab.</p>
+              <p class="footer-note">Use recover only if local class data is corrupted. Import accepts JSON files exported from Session.</p>
               <input class="sr-only" id="${this.importInputId}" type="file" accept="application/json" />
             </div>
           </section>
@@ -301,7 +301,7 @@ export class TeacherApp {
           <div>
             <p class="eyebrow">Teacher dashboard</p>
             <h2>${escapeHtml(this.state.classInfo.name)} · ${escapeHtml(this.state.classInfo.period)}</h2>
-            <p class="muted">Version ${this.state.version} · ${Object.keys(this.state.students).length} students · IndexedDB snapshots active</p>
+            <p class="muted">${Object.keys(this.state.students).length} students · Version ${this.state.version} · Auto-save active</p>
           </div>
           <div class="level-chip">Class Code <span>${escapeHtml(this.state.classInfo.code)}</span></div>
         </div>
@@ -356,7 +356,7 @@ export class TeacherApp {
         <section class="view-card">
           <div class="session-banner">
             <div>
-              <p class="muted">Share this code or scan the QR link below.</p>
+              <p class="muted">Share this code or QR link so students can join quickly.</p>
               <div class="code-display">${escapeHtml(this.state.classInfo.code)}</div>
             </div>
             <div class="inline-actions">
@@ -370,7 +370,7 @@ export class TeacherApp {
               <div class="muted">${escapeHtml(joinUrl)}</div>
             </div>
             <div class="view-card">
-              <h3>Session controls</h3>
+              <h3>Class details</h3>
               <div class="form-stack">
                 <label><span>Class name</span><input class="field" id="session-class-name" type="text" value="${escapeHtml(this.state.classInfo.name)}" /></label>
                 <label><span>Period</span><input class="field" id="session-period" type="text" value="${escapeHtml(this.state.classInfo.period)}" /></label>
@@ -640,6 +640,7 @@ export class TeacherApp {
       <div class="settings-grid">
         <section class="view-card">
           <h3>Class settings</h3>
+          <p class="muted">Tune XP pacing and streak flexibility so rules match your classroom style.</p>
           <form id="settings-form" class="form-stack">
             <label><span>Participation XP weight</span><input class="field" name="participationWeight" type="number" min="0" step="0.1" value="${this.state.settings.xpWeights.participation}" /></label>
             <label><span>Assignment XP weight</span><input class="field" name="assignmentWeight" type="number" min="0" step="0.1" value="${this.state.settings.xpWeights.assignments}" /></label>
@@ -647,9 +648,20 @@ export class TeacherApp {
             <label><span>Streak grace days</span><input class="field" name="graceDays" type="number" min="0" step="1" value="${this.state.settings.streakConfig.graceDays}" /></label>
             <div class="button-row"><button class="primary-button" type="submit">Save Settings</button></div>
           </form>
+          <div class="card-grid">
+            <div class="metric-card">
+              <div class="row-title">Recommended defaults</div>
+              <div class="muted">Start with 1.0 for participation and assignments, then adjust after a week of class data.</div>
+            </div>
+            <div class="metric-card">
+              <div class="row-title">Streak support</div>
+              <div class="muted">Use grace days to prevent absences or schedule changes from breaking momentum.</div>
+            </div>
+          </div>
         </section>
         <section class="view-card">
           <h3>Behavior categories & badges</h3>
+          <p class="muted">Create clear behavior signals and tune badge thresholds for meaningful recognition.</p>
           <form id="category-form" class="form-grid">
             <label><span>Category name</span><input class="field" name="name" type="text" placeholder="Citizenship" required /></label>
             <label><span>Points</span><input class="field" name="points" type="number" value="10" required /></label>
