@@ -31,6 +31,10 @@ function escapeHtml(text = '') {
     .replaceAll("'", '&#39;');
 }
 
+function normalizeStudentId(value) {
+  return String(value || '').trim().toLowerCase().replace(/\s+/g, '-');
+}
+
 export class TeacherApp {
   constructor({ root, toast, celebrate, updateConnectionPill }) {
     this.root = root;
@@ -72,6 +76,11 @@ export class TeacherApp {
 
     this.peer.addEventListener('join-request', (event) => {
       const detail = event.detail;
+      const studentId = normalizeStudentId(detail.payload?.studentId);
+      if (!studentId) {
+        this.peer.denyJoin(detail.connectionId, 'A valid student ID is required to join this classroom.', detail.transport || 'peer');
+        return;
+      }
       this.pendingJoins = [
         ...this.pendingJoins.filter((item) => item.connectionId !== detail.connectionId),
         detail,
@@ -209,11 +218,17 @@ export class TeacherApp {
   async approveJoin(connectionId) {
     const request = this.pendingJoins.find((item) => item.connectionId === connectionId);
     if (!request || !this.state) return;
-    const studentId = (request.payload.studentId || request.payload.name || '').trim().toLowerCase().replace(/\s+/g, '-');
+    const studentId = normalizeStudentId(request.payload.studentId);
+    if (!studentId) {
+      this.peer.denyJoin(connectionId, 'A valid student ID is required to join this classroom.', request.transport || 'peer');
+      this.pendingJoins = this.pendingJoins.filter((item) => item.connectionId !== connectionId);
+      this.render();
+      return;
+    }
     await this.applyAuthoritativeAction({
       type: 'APPROVE_STUDENT',
       student: {
-        id: studentId || generateId('student'),
+        id: studentId,
         name: request.payload.name || request.payload.studentId || 'Student',
       },
     }, false);
@@ -374,7 +389,7 @@ export class TeacherApp {
           <div class="request-row">
             <div>
               <div class="row-title">${escapeHtml(request.payload?.name || request.payload?.studentId || 'Student')}</div>
-              <div class="muted">${escapeHtml(request.payload?.studentId || 'No ID provided')}</div>
+              <div class="muted">${escapeHtml(request.payload?.studentId || 'Missing student ID')}</div>
             </div>
             <div class="inline-actions">
               <button class="primary-button" type="button" data-action="approve-join" data-connection-id="${request.connectionId}">Approve</button>

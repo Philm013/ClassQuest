@@ -144,9 +144,9 @@ export class StudentApp {
   async joinClassroom(formData) {
     const code = String(formData.get('code') || '').trim().toUpperCase();
     const studentName = String(formData.get('name') || '').trim();
-    const studentId = String(formData.get('studentId') || studentName).trim();
-    if (!code || !studentName) {
-      this.toast('Enter a classroom code and your name.');
+    const studentId = String(formData.get('studentId') || '').trim();
+    if (!code || !studentName || !studentId) {
+      this.toast('Enter a classroom code, your name, and your student ID.');
       return;
     }
     this.studentName = studentName;
@@ -199,7 +199,7 @@ export class StudentApp {
             <form id="student-join-form" class="form-stack">
               <label><span>Classroom code</span><input class="field" name="code" type="text" maxlength="6" value="${escapeHtml(this.classroomCode)}" required /></label>
               <label><span>Your name</span><input class="field" name="name" type="text" value="${escapeHtml(this.studentName)}" required /></label>
-              <label><span>Student ID (optional)</span><input class="field" name="studentId" type="text" value="${escapeHtml(this.studentId)}" /></label>
+              <label><span>Student ID</span><input class="field" name="studentId" type="text" value="${escapeHtml(this.studentId)}" required /></label>
               <div class="button-row"><button class="primary-button" type="submit">Connect to Realm</button></div>
             </form>
             ${this.joinDenied ? `<div class="offline-banner"><strong>${escapeHtml(this.joinDenied)}</strong></div>` : ''}
