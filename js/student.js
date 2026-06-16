@@ -172,13 +172,13 @@ export class StudentApp {
         <div class="hero">
           <div>
             <p class="eyebrow">Student mode</p>
-            <h2>Join the quest and watch your progress level up.</h2>
-            <p>Enter your classroom code, sync with the teacher host, and keep working even if the host goes offline using your last local snapshot.</p>
+            <h2>Jump into class quests and see your progress grow.</h2>
+            <p>Enter your classroom code to join your teacher and classmates. Your latest progress is still available if the teacher connection drops.</p>
           </div>
           <div class="hero-panel">
-            <div class="hero-stat"><span>Live status</span><strong>Host approval + local pending action queue</strong></div>
-            <div class="hero-stat"><span>Offline-safe</span><strong>Read-only recovery from IndexedDB snapshots</strong></div>
-            <div class="hero-stat"><span>Demo mode</span><strong>BroadcastChannel fallback when PeerJS is unavailable</strong></div>
+            <div class="hero-stat"><span>Live updates</span><strong>Get classroom changes and assignment updates as they happen.</strong></div>
+            <div class="hero-stat"><span>Your momentum</span><strong>Track XP, levels, badges, and streaks all in one dashboard.</strong></div>
+            <div class="hero-stat"><span>Always available</span><strong>Keep viewing your latest synced progress in offline-safe mode.</strong></div>
           </div>
         </div>
         <div class="dashboard two-col">
@@ -195,9 +195,9 @@ export class StudentApp {
           <section class="view-card">
             <h3>What you will see</h3>
             <div class="card-grid">
-              <div class="metric-card"><div class="row-title">XP Dashboard</div><div class="muted">Track your level, streak, and quest progress.</div></div>
-              <div class="metric-card"><div class="row-title">Assignments</div><div class="muted">Mark work in progress or submit it for teacher review.</div></div>
-              <div class="metric-card"><div class="row-title">Avatar Lab</div><div class="muted">Unlock fun cosmetics with XP milestones.</div></div>
+              <div class="metric-card"><div class="row-title">Quest progress</div><div class="muted">See your level, streak, and XP climb in real time.</div></div>
+              <div class="metric-card"><div class="row-title">Assignment tracker</div><div class="muted">Show work in progress or submit when you're ready.</div></div>
+              <div class="metric-card"><div class="row-title">Rewards & avatar</div><div class="muted">Unlock badges and customize your character as you grow.</div></div>
             </div>
           </section>
         </div>
@@ -220,11 +220,11 @@ export class StudentApp {
           <div>
             <p class="eyebrow">Student dashboard</p>
             <h2>${escapeHtml(this.state.classInfo.name)} · ${escapeHtml(this.studentName || student?.name || 'Student')}</h2>
-            <p class="muted">Class code ${escapeHtml(this.state.classInfo.code)} · Pending queue ${this.pendingCount}</p>
+            <p class="muted">Class code ${escapeHtml(this.state.classInfo.code)} · Pending updates ${this.pendingCount}</p>
           </div>
           <div class="level-chip">${student ? `Level ${student.level}` : 'Awaiting approval'}</div>
         </div>
-        ${this.peer.hostOnline ? '' : '<div class="offline-banner"><strong>Host Offline</strong><span>Your last synced data is available. Pending actions will retry automatically.</span></div>'}
+        ${this.peer.hostOnline ? '<div class="info-banner"><strong>Quest status:</strong><span>You are connected live to your classroom.</span></div>' : '<div class="offline-banner"><strong>Teacher offline</strong><span>Your last synced data is available. Pending actions will retry automatically.</span></div>'}
         <div class="tab-row">${tabs.map(([id, label]) => `<button class="tab-pill ${this.currentTab === id ? 'active' : ''}" type="button" data-tab="${id}">${label}</button>`).join('')}</div>
         ${this.renderStudentPanel()}
       </section>
@@ -250,11 +250,20 @@ export class StudentApp {
     const student = this.getCurrentStudent();
     if (!student) return '<div class="view-card"><div class="empty-state">Waiting for teacher approval.</div></div>';
     const progress = getLevelProgress(student.xp || 0);
+    const assignments = Object.values(this.state.assignments || {}).filter((assignment) => !assignment.archived);
+    const completedAssignments = assignments.filter((assignment) => {
+      const status = assignment.studentStatuses?.[student.id] || 'assigned';
+      return status === 'completed';
+    }).length;
+    const submittedAssignments = assignments.filter((assignment) => {
+      const status = assignment.studentStatuses?.[student.id] || 'assigned';
+      return status === 'submitted';
+    }).length;
     return `
       <div class="student-layout">
         <section class="view-card">
           <div class="metric-card">
-            <div class="metric-label">XP to next level</div>
+            <div class="metric-label">XP progress</div>
             <div class="metric-value">${student.xp}</div>
             <div class="xp-bar-shell"><div class="xp-bar-fill" style="width:${progress.percent}%"></div></div>
             <p class="muted">${progress.toNextLevel} XP until Level ${Math.min(student.level + 1, 20)}</p>
@@ -279,11 +288,11 @@ export class StudentApp {
         </section>
         <section class="view-card">
           <div class="level-chip">Level ${student.level}</div>
-          <h3>Your active streak</h3>
-          <p class="muted">Keep positive behavior and completed work going to extend your streak.</p>
-          <div class="hero-stat"><span>Total XP</span><strong>${student.xp}</strong></div>
+          <h3>Your quest tracker</h3>
+          <p class="muted">Keep your streak going and complete assignments to keep leveling up.</p>
           <div class="hero-stat"><span>Class rank</span><strong>#${this.getRank(student.id)}</strong></div>
-          <div class="hero-stat"><span>Connection</span><strong>${this.peer.hostOnline ? 'Live with teacher host' : 'Offline-safe snapshot mode'}</strong></div>
+          <div class="hero-stat"><span>Assignments completed</span><strong>${completedAssignments} done · ${submittedAssignments} waiting for review</strong></div>
+          <div class="hero-stat"><span>Connection</span><strong>${this.peer.hostOnline ? 'Live classroom sync' : 'Offline-safe snapshot mode'}</strong></div>
         </section>
       </div>
     `;
