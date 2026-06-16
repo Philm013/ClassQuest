@@ -66,7 +66,7 @@ export class TeacherApp {
   attachPeerEvents() {
     this.peer.addEventListener('status', (event) => {
       const detail = event.detail || {};
-      this.updateConnectionPill(detail.demoMode ? 'Demo Mode' : detail.status, detail.demoMode ? 'demo' : detail.status.includes('offline') ? 'offline' : 'online');
+      this.updateConnectionPill(detail.demoMode ? 'Local Mode' : detail.status, detail.demoMode ? 'demo' : detail.status.includes('offline') ? 'offline' : 'online');
       if (detail.message) this.toast(detail.message);
     });
 
@@ -253,15 +253,15 @@ export class TeacherApp {
         <div class="hero hero-portal">
           <div class="hero-copy">
             <p class="eyebrow">Teacher mode</p>
-            <h2>Open your classroom guild hall.</h2>
-            <p>Spin up a game-master dashboard for lessons, badges, avatars, and collaborative class progression without adding setup friction.</p>
+            <h2>Start your classroom workspace.</h2>
+            <p>Launch a reliable teaching dashboard for assignments, activity tracking, student recognition, and class goals.</p>
             <div class="hero-actions">
-              <button class="primary-button" type="button" data-action="demo-teacher">Open demo guild hall</button>
+              <button class="primary-button" type="button" data-action="quickstart-teacher">Quick start with sample class</button>
             </div>
             <div class="hero-token-row">
-              <span class="status-pill online">Quest-led lessons</span>
-              <span class="status-pill demo">Badge campaigns</span>
-              <span class="status-pill">Avatar metadata ready</span>
+              <span class="status-pill online">Live roster control</span>
+              <span class="status-pill">Activity and assignment tracking</span>
+              <span class="status-pill">Export and restore backups</span>
             </div>
           </div>
           <div class="hero-stage">
@@ -270,25 +270,25 @@ export class TeacherApp {
         </div>
         <div class="dashboard two-col">
           <section class="view-card">
-            <h3>Create a new campaign</h3>
+            <h3>Create a new session</h3>
             <form id="teacher-session-form" class="form-stack">
               <label><span>Class name</span><input class="field" name="className" type="text" value="Quest Academy" required /></label>
               <label><span>Period</span><input class="field" name="period" type="text" value="Period 1" required /></label>
               <div class="button-row">
-                <button class="primary-button" type="submit">Create Campaign</button>
+                <button class="primary-button" type="submit">Create Session</button>
               </div>
             </form>
           </section>
           <section class="view-card">
-            <h3>Restore a saved realm</h3>
+            <h3>Restore a saved session</h3>
             <div class="form-stack">
               <label><span>Saved sessions</span><select class="field" id="restore-session-select">${restoreOptions}</select></label>
               <div class="button-row">
-                <button class="secondary-button" type="button" data-action="restore-selected">Restore Realm</button>
+                <button class="secondary-button" type="button" data-action="restore-selected">Restore Session</button>
                 <button class="ghost-button" type="button" data-action="import-session">Import Backup</button>
                 <button class="danger-button" type="button" data-action="recover-db">Recover DB</button>
               </div>
-              <p class="footer-note">Use recover only if local class data is corrupted. Import accepts JSON files exported from an existing campaign.</p>
+              <p class="footer-note">Use recover only if local class data is corrupted. Import accepts JSON files exported from an existing session.</p>
               <input class="sr-only" id="${this.importInputId}" type="file" accept="application/json" />
             </div>
           </section>
@@ -299,13 +299,13 @@ export class TeacherApp {
 
   renderDashboard() {
     const tabs = [
-      ['session', 'Realm'],
-      ['roster', 'Party'],
-      ['behavior', 'Activity Log'],
-      ['assignments', 'Quest Board'],
+      ['session', 'Operations'],
+      ['roster', 'Roster'],
+      ['behavior', 'Activity'],
+      ['assignments', 'Assignments'],
       ['leaderboard', 'Rankings'],
-      ['goals', 'World Goals'],
-      ['settings', 'Rules'],
+      ['goals', 'Class Goals'],
+      ['settings', 'Settings'],
     ];
     const students = Object.values(this.state.students || {});
     const totalXP = students.reduce((sum, student) => sum + (student.xp || 0), 0);
@@ -316,7 +316,7 @@ export class TeacherApp {
           <div>
             <p class="eyebrow">Teacher dashboard</p>
             <h2>${escapeHtml(this.state.classInfo.name)} · ${escapeHtml(this.state.classInfo.period)}</h2>
-            <p class="muted">${students.length} adventurers · Version ${this.state.version} · Auto-save active</p>
+            <p class="muted">${students.length} students · Version ${this.state.version} · Auto-save active</p>
           </div>
           <div class="level-chip">Class Code <span>${escapeHtml(this.state.classInfo.code)}</span></div>
         </div>
@@ -324,7 +324,7 @@ export class TeacherApp {
           <article class="metric-card feature-card">
             <div class="metric-label">Guild roster</div>
             <div class="metric-value">${students.length}</div>
-            <p class="muted">Connected students, approvals, and offline-safe snapshots all feed the same classroom campaign.</p>
+            <p class="muted">Connected students, approvals, and offline-safe snapshots all feed the same classroom record.</p>
           </article>
           <article class="metric-card feature-card">
             <div class="metric-label">Total class XP</div>
@@ -388,7 +388,7 @@ export class TeacherApp {
         <section class="view-card">
           <div class="session-banner">
             <div>
-              <p class="muted">Invite students into the realm with a code, QR portal, or shared guild link.</p>
+              <p class="muted">Invite students with a class code, QR link, or shareable join URL.</p>
               <div class="code-display">${escapeHtml(this.state.classInfo.code)}</div>
             </div>
             <div class="inline-actions">
@@ -415,11 +415,12 @@ export class TeacherApp {
           </div>
         </section>
         <section class="view-card">
-          <h3>Realm staging</h3>
+          <h3>Session overview</h3>
           ${renderPlaceholderArtwork('teacher', {
-            title: 'Classroom Worldboard',
-            label: 'Realm Board',
-            prompt: 'classroom MMORPG command board with join portal, quest list, badge wall, and student avatars waiting in lobby',
+            title: 'Classroom session readiness',
+            label: 'Session Board',
+            summary: 'Monitor joins, active assignments, and class goals before students begin.',
+            highlights: ['Approvals queue', 'Lesson inventory', 'Goal progress'],
           })}
           <div class="dashboard-grid compact-grid">
             <div class="metric-card">
@@ -427,7 +428,7 @@ export class TeacherApp {
               <div class="metric-value">${this.pendingJoins.length}</div>
             </div>
             <div class="metric-card">
-              <div class="metric-label">Active quests</div>
+              <div class="metric-label">Active assignments</div>
               <div class="metric-value">${Object.values(this.state.assignments || {}).filter((assignment) => !assignment.archived).length}</div>
             </div>
             <div class="metric-card">
@@ -488,7 +489,7 @@ export class TeacherApp {
     return `
       <div class="roster-layout">
         <section class="view-card">
-          <h3>Live party roster</h3>
+          <h3>Live class roster</h3>
           ${requestMarkup}
           <div class="roster-list">
             ${students.length ? students.sort((a, b) => b.xp - a.xp).map((student) => `
@@ -520,7 +521,7 @@ export class TeacherApp {
           <h3>Log activity events</h3>
           <form id="behavior-form" class="form-stack">
             <div>
-              <span class="label">Select party members</span>
+              <span class="label">Select students</span>
               <div class="card-grid">
                 ${students.length ? students.map((student) => `
                   <label class="list-row">
@@ -543,11 +544,12 @@ export class TeacherApp {
           </form>
         </section>
         <section class="view-card">
-          <h3>Recent classroom battle log</h3>
+          <h3>Recent classroom activity</h3>
           ${renderPlaceholderArtwork('badge', {
-            title: 'Activity FX Concepts',
-            label: 'UI FX',
-            prompt: 'classroom-safe burst effects for participation, teamwork, positive streaks, and badge unlocks in a fantasy school interface',
+            title: 'Activity timeline',
+            label: 'Recent Log',
+            summary: 'Review recent classroom events and outcomes in chronological order.',
+            highlights: ['Timestamped history', 'Student context', 'Category tracking'],
           })}
           <div class="timeline-list">
             ${this.state.behaviorLog.length ? this.state.behaviorLog.slice(0, 18).map((event) => {
@@ -572,7 +574,7 @@ export class TeacherApp {
     return `
       <div class="dashboard">
         <section class="view-card">
-          <h3>Forge or edit lesson quests</h3>
+          <h3>Create or edit assignments</h3>
           <form id="assignment-form" class="form-grid">
             <input type="hidden" name="assignmentId" id="assignment-id" />
             <label><span>Quest title</span><input class="field" name="title" type="text" required /></label>
@@ -594,7 +596,8 @@ export class TeacherApp {
                 ${renderPlaceholderArtwork('quest', {
                   title: assignment.title,
                   label: `${difficulty.label} Quest`,
-                  prompt: `lesson quest card for ${assignment.title}, classroom mission rewards, fantasy academy quest board, ${assignment.desc}`,
+                  summary: assignment.desc,
+                  highlights: [`${assignment.xpReward} XP reward`, `Due ${formatDate(assignment.dueDate)}`, `${difficulty.label} priority`],
                 })}
                 <div class="quest-card-header">
                   <div>
@@ -636,7 +639,7 @@ export class TeacherApp {
                 </table>
               </article>
             `;
-          }).join('') : '<div class="empty-state">No active lesson quests yet.</div>'}
+          }).join('') : '<div class="empty-state">No active assignments yet.</div>'}
         </section>
       </div>
     `;
@@ -666,9 +669,10 @@ export class TeacherApp {
         <section class="view-card">
           <h3>Reward store</h3>
           ${renderPlaceholderArtwork('avatar', {
-            title: 'Class Reward Boutique',
-            label: 'Reward Shop',
-            prompt: 'classroom reward shop with cosmetic avatar unlocks, guild perks, reward tickets, magical school market board',
+            title: 'Class reward catalog',
+            label: 'Reward Store',
+            summary: 'Publish transparent class rewards students can work toward.',
+            highlights: ['XP pricing', 'Availability status', 'Class incentives'],
           })}
           <div class="card-grid">
             ${(this.state.rewardStore || []).map((reward) => `
@@ -687,7 +691,7 @@ export class TeacherApp {
     return `
       <div class="two-col">
         <section class="view-card">
-          <h3>Create a world goal</h3>
+          <h3>Create a class goal</h3>
           <form id="goal-form" class="form-stack">
             <label><span>Goal title</span><input class="field" name="title" type="text" placeholder="Reach 5000 XP" required /></label>
             <label><span>Target XP</span><input class="field" name="targetXP" type="number" min="1" value="5000" required /></label>
@@ -695,9 +699,10 @@ export class TeacherApp {
             <div class="button-row"><button class="primary-button" type="submit">Add Goal</button></div>
           </form>
           ${renderPlaceholderArtwork('quest', {
-            title: 'Collaborative Goal Banner',
-            label: 'World Event',
-            prompt: 'class-wide collaborative classroom event banner, students filling a giant XP crystal, school-safe fantasy teamwork scene',
+            title: 'Collaborative class goal',
+            label: 'Class Goal',
+            summary: 'Track shared targets that encourage teamwork and positive momentum.',
+            highlights: ['Shared XP target', 'Visible progress', 'Reward unlock'],
           })}
         </section>
         <section class="goal-grid">
@@ -723,7 +728,7 @@ export class TeacherApp {
       <div class="settings-grid">
         <section class="view-card">
           <h3>Realm rules</h3>
-          <p class="muted">Tune XP pacing and streak flexibility so your classroom campaign matches the tone you want.</p>
+          <p class="muted">Tune XP pacing and streak flexibility so settings match your classroom goals.</p>
           <form id="settings-form" class="form-stack">
             <label><span>Participation XP weight</span><input class="field" name="participationWeight" type="number" min="0" step="0.1" value="${this.state.settings.xpWeights.participation}" /></label>
             <label><span>Assignment XP weight</span><input class="field" name="assignmentWeight" type="number" min="0" step="0.1" value="${this.state.settings.xpWeights.assignments}" /></label>
@@ -789,8 +794,8 @@ export class TeacherApp {
       await this.loadSession(select?.value || '');
     });
 
-    this.root.querySelector('[data-action="demo-teacher"]')?.addEventListener('click', async () => {
-      await this.createSession(new FormData(Object.assign(document.createElement('form'), { innerHTML: '<input name="className" value="Demo Quest" /><input name="period" value="Sandbox" />' })), true);
+    this.root.querySelector('[data-action="quickstart-teacher"]')?.addEventListener('click', async () => {
+      await this.createSession(new FormData(Object.assign(document.createElement('form'), { innerHTML: '<input name="className" value="Sample Session" /><input name="period" value="Quickstart" />' })), true);
     });
 
     this.root.querySelector('[data-action="recover-db"]')?.addEventListener('click', async () => {

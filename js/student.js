@@ -54,7 +54,7 @@ export class StudentApp {
 
   attachPeerEvents() {
     this.peer.addEventListener('status', ({ detail }) => {
-      const status = detail.demoMode ? 'Demo Mode' : detail.status;
+      const status = detail.demoMode ? 'Local Mode' : detail.status;
       const tone = detail.status === 'offline' ? 'offline' : detail.demoMode ? 'demo' : 'online';
       this.updateConnectionPill(status, tone);
       if (detail.status === 'offline') this.toast('Host offline. Local snapshot remains available.');
@@ -181,12 +181,12 @@ export class StudentApp {
         <div class="hero hero-portal">
           <div class="hero-copy">
             <p class="eyebrow">Student mode</p>
-            <h2>Step into your classroom campaign.</h2>
-            <p>Enter your class code to unlock quests, badges, and avatar progression. Your latest synced progress still stays visible if the host drops offline.</p>
+            <h2>Join your classroom workspace.</h2>
+            <p>Enter your class code to track assignments, progress, and recognition. Your latest synced progress remains available if the host goes offline.</p>
             <div class="hero-token-row">
-              <span class="status-pill online">Live quest updates</span>
-              <span class="status-pill">Collectible badges</span>
-              <span class="status-pill demo">Avatar studio</span>
+              <span class="status-pill online">Live class updates</span>
+              <span class="status-pill">Achievement tracking</span>
+              <span class="status-pill">Student customization</span>
             </div>
           </div>
           <div class="hero-stage">
@@ -195,7 +195,7 @@ export class StudentApp {
         </div>
         <div class="dashboard two-col">
           <section class="view-card">
-            <h3>Join classroom guild</h3>
+            <h3>Join classroom session</h3>
             <form id="student-join-form" class="form-stack">
               <label><span>Classroom code</span><input class="field" name="code" type="text" maxlength="6" value="${escapeHtml(this.classroomCode)}" required /></label>
               <label><span>Your name</span><input class="field" name="name" type="text" value="${escapeHtml(this.studentName)}" required /></label>
@@ -208,7 +208,7 @@ export class StudentApp {
             <h3>What you will unlock</h3>
             <div class="card-grid">
               <div class="metric-card"><div class="row-title">Quest progress</div><div class="muted">See your level, streak, and XP climb in real time.</div></div>
-              <div class="metric-card"><div class="row-title">Guild board</div><div class="muted">Track rankings, classmates, and world goals like a party roster.</div></div>
+              <div class="metric-card"><div class="row-title">Class board</div><div class="muted">Track rankings, classmates, and class goals with clear status updates.</div></div>
               <div class="metric-card"><div class="row-title">Rewards & avatar</div><div class="muted">Unlock badges and customize your character as you grow.</div></div>
             </div>
           </section>
@@ -220,11 +220,11 @@ export class StudentApp {
   renderDashboard() {
     const student = this.getCurrentStudent();
     const tabs = [
-      ['dashboard', 'Character'],
-      ['assignments', 'Quests'],
+      ['dashboard', 'Overview'],
+      ['assignments', 'Assignments'],
       ['badges', 'Badges'],
-      ['leaderboard', 'Guild'],
-      ['avatar', 'Avatar Lab'],
+      ['leaderboard', 'Class'],
+      ['avatar', 'Avatar'],
     ];
     return `
       <section class="dashboard">
@@ -246,7 +246,7 @@ export class StudentApp {
             <article class="metric-card feature-card">
               <div class="metric-label">Affinity</div>
               <div class="metric-value metric-value-sm">${escapeHtml(getStudentAffinity(student))}</div>
-              <p class="muted">A quick read on your recent momentum, badge style, and role in the guild.</p>
+              <p class="muted">A quick read on your recent momentum, recognition, and current class standing.</p>
             </article>
             <article class="metric-card feature-card">
               <div class="metric-label">Quest inventory</div>
@@ -319,13 +319,14 @@ export class StudentApp {
         </section>
         <section class="view-card">
           ${renderPlaceholderArtwork('student', {
-            title: `${student.name} Hero Portrait`,
-            label: 'Player Profile',
-            prompt: `student classroom hero portrait for ${student.name}, school-safe fantasy academy, badges, quest journal, title ${getStudentTitle(student)}`,
+            title: `${student.name} Progress Snapshot`,
+            label: 'Student Profile',
+            summary: `Track ${student.name}'s current level, assignment completion, and classroom momentum.`,
+            highlights: [`Level ${student.level}`, `${completedAssignments} completed`, `${submittedAssignments} pending review`],
           })}
           <div class="level-chip">Level ${student.level}</div>
-          <h3>Your quest tracker</h3>
-          <p class="muted">Keep your streak going and complete lesson quests to keep leveling up.</p>
+          <h3>Your progress tracker</h3>
+          <p class="muted">Keep your streak going and complete lesson work to maintain steady growth.</p>
           <div class="hero-stat"><span>Class rank</span><strong>#${this.getRank(student.id)}</strong></div>
           <div class="hero-stat"><span>Quests completed</span><strong>${completedAssignments} done · ${submittedAssignments} waiting for review</strong></div>
           <div class="hero-stat"><span>Connection</span><strong>${this.peer.hostOnline ? 'Live classroom sync' : 'Offline-safe snapshot mode'}</strong></div>
@@ -348,7 +349,8 @@ export class StudentApp {
               ${renderPlaceholderArtwork('quest', {
                 title: assignment.title,
                 label: `${difficulty.label} Lesson Quest`,
-                prompt: `student lesson quest card for ${assignment.title}, classroom objective, school-safe RPG mission UI, ${assignment.desc}`,
+                summary: assignment.desc,
+                highlights: [`${assignment.xpReward} XP`, `Due ${assignment.dueDate}`, `${difficulty.label} priority`],
               })}
               <div class="quest-card-header">
                 <h3>${escapeHtml(assignment.title)}</h3>
@@ -376,9 +378,10 @@ export class StudentApp {
     return `
       <section class="badge-grid">
         ${renderPlaceholderArtwork('badge', {
-          title: 'Badge Vault Concepts',
-          label: 'Achievement Wall',
-          prompt: 'classroom achievement wall with collectible enamel badges, school-safe fantasy guild emblems, visible progression tiers',
+          title: 'Achievement wall',
+          label: 'Recognition',
+          summary: 'See earned and upcoming badges tied to class participation and assignment milestones.',
+          highlights: ['Earned badges', 'Unlock targets', 'Progressive goals'],
         })}
         ${(this.state.badges || []).map((badge) => `
           <article class="badge-card ${earned.has(badge.id) ? '' : 'locked'}">
@@ -423,9 +426,10 @@ export class StudentApp {
       <div class="student-layout">
         <section class="avatar-card">
           ${renderPlaceholderArtwork('avatar', {
-            title: `${student?.name || 'Student'} Avatar Sheet`,
-            label: 'Avatar Concept',
-            prompt: `student avatar customization board for ${student?.name || 'student'}, classroom fantasy cosmetics, hats, accessories, school-safe wardrobe`,
+            title: `${student?.name || 'Student'} Customization`,
+            label: 'Avatar Settings',
+            summary: 'Customize your student avatar using unlocked classroom-safe options.',
+            highlights: ['Color themes', 'Unlocked hats', 'Unlocked accessories'],
           })}
           <div class="avatar-preview">
             <div class="avatar-body">

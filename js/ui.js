@@ -9,70 +9,40 @@ function escapeHtml(text = '') {
 
 export const PLACEHOLDER_SCENES = {
   landing: {
-    title: 'ClassQuest Key Art',
-    label: 'Launch Splash',
-    prompt: 'Classroom MMORPG hub, diverse students and teacher avatars, glowing quest board, cozy fantasy academy, pixel-inspired UI, high-energy composition',
-    style: 'pixel fantasy classroom concept art',
-    lighting: 'sunlit windows with magical neon UI glow',
-    shot: 'wide hero scene',
-    aspect: '16:10',
-    palette: 'violet, gold, cyan, slate',
-    negative: 'photorealism, weapons, violence, empty room, dystopian mood',
+    title: 'Classroom operations at a glance',
+    label: 'Platform Overview',
+    summary: 'Track behavior, assignments, and progress from one live classroom workspace.',
+    highlights: ['Live updates', 'Class snapshots', 'Progress visibility'],
   },
   teacher: {
-    title: 'Teacher Command Center',
-    label: 'GM Console',
-    prompt: 'teacher game master station overlooking classroom guild hall, holographic lesson quests, student badges, collaborative goals, magical tactical map',
-    style: 'stylized strategy dashboard illustration',
-    lighting: 'gold rim light with cool holographic accents',
-    shot: 'three-quarter environment shot',
-    aspect: '4:3',
-    palette: 'navy, amethyst, amber, teal',
-    negative: 'office cubicles, blank whiteboards, realism, clutter',
+    title: 'Teacher command center',
+    label: 'Session Management',
+    summary: 'Run attendance, activity logs, assignments, and goals in a single teaching flow.',
+    highlights: ['Fast setup', 'Roster control', 'Reliable backups'],
   },
   student: {
-    title: 'Student Adventure Portrait',
-    label: 'Player Card',
-    prompt: 'student hero portrait in fantasy classroom academy, badge sash, quest journal, expressive and optimistic, school-safe MMORPG aesthetic',
-    style: 'character card illustration',
-    lighting: 'soft key light with magical spark particles',
-    shot: 'medium portrait',
-    aspect: '3:4',
-    palette: 'purple, sky blue, warm gold',
-    negative: 'adult features, dark horror, gritty realism, weapons',
+    title: 'Student progress view',
+    label: 'Learner Experience',
+    summary: 'Give students a clear view of goals, recognition, and next steps.',
+    highlights: ['Personal progress', 'Assignment status', 'Badge milestones'],
   },
   quest: {
-    title: 'Lesson Quest Poster',
-    label: 'Quest Tile',
-    prompt: 'quest poster for a classroom lesson mission, floating books, puzzle icons, reward stamps, stylized map fragments, school-safe fantasy adventure',
-    style: 'posterized UI concept art',
-    lighting: 'dramatic top glow with paper texture',
-    shot: 'framed mission poster',
-    aspect: '4:5',
-    palette: 'indigo, parchment, gold, emerald',
-    negative: 'battle damage, scary monsters, realistic guns, empty poster',
+    title: 'Assignment card',
+    label: 'Lesson Workflow',
+    summary: 'Keep each assignment scoped with due dates, XP impact, and review status.',
+    highlights: ['Due dates', 'Progress states', 'Teacher review'],
   },
   badge: {
-    title: 'Achievement Emblem Sheet',
-    label: 'Badge Concept',
-    prompt: 'collectible achievement emblems for classroom quests, enamel pins, stars, books, teamwork crests, progression tiers',
-    style: 'vector badge sheet',
-    lighting: 'studio soft light',
-    shot: 'flat lay icon sheet',
-    aspect: '1:1',
-    palette: 'gold, ruby, sapphire, silver',
-    negative: 'corporate logos, photo textures, low contrast',
+    title: 'Recognition system',
+    label: 'Achievement Tracking',
+    summary: 'Celebrate meaningful milestones with transparent classroom criteria.',
+    highlights: ['Clear criteria', 'Student motivation', 'Visible growth'],
   },
   avatar: {
-    title: 'Avatar Wardrobe Board',
-    label: 'Cosmetic Sheet',
-    prompt: 'customizable student avatar cosmetic wardrobe, capes, hats, glasses, crowns, friendly classroom fantasy fashion',
-    style: 'character customization concept board',
-    lighting: 'bright showroom glow',
-    shot: 'front-facing turnaround sheet',
-    aspect: '5:4',
-    palette: 'orchid, blue, gold, coral',
-    negative: 'armor violence, realistic skin pores, dark mood',
+    title: 'Student identity tools',
+    label: 'Customization',
+    summary: 'Support student ownership with safe, classroom-friendly personalization.',
+    highlights: ['Unlocked options', 'Class-safe visuals', 'Progress rewards'],
   },
 };
 
@@ -119,8 +89,9 @@ export function getRankTitle(index = 0) {
 
 export function renderPlaceholderArtwork(sceneKey, overrides = {}) {
   const scene = { ...(PLACEHOLDER_SCENES[sceneKey] || PLACEHOLDER_SCENES.quest), ...overrides };
+  const highlights = (scene.highlights || []).slice(0, 3);
   return `
-    <figure class="placeholder-art" data-scene="${escapeHtml(sceneKey)}" data-prompt="${escapeHtml(scene.prompt)}" data-style="${escapeHtml(scene.style)}" data-lighting="${escapeHtml(scene.lighting)}" data-shot="${escapeHtml(scene.shot)}" data-aspect="${escapeHtml(scene.aspect)}" data-palette="${escapeHtml(scene.palette)}" data-negative="${escapeHtml(scene.negative)}">
+    <figure class="placeholder-art" data-scene="${escapeHtml(sceneKey)}">
       <div class="placeholder-art-frame">
         <span class="placeholder-art-label">${escapeHtml(scene.label)}</span>
         <div class="placeholder-art-orb"></div>
@@ -128,12 +99,8 @@ export function renderPlaceholderArtwork(sceneKey, overrides = {}) {
       </div>
       <figcaption class="placeholder-art-meta">
         <strong>${escapeHtml(scene.title)}</strong>
-        <span><b>Prompt:</b> ${escapeHtml(scene.prompt)}</span>
-        <span><b>Style:</b> ${escapeHtml(scene.style)}</span>
-        <span><b>Light:</b> ${escapeHtml(scene.lighting)}</span>
-        <span><b>Shot:</b> ${escapeHtml(scene.shot)} · <b>Aspect:</b> ${escapeHtml(scene.aspect)}</span>
-        <span><b>Palette:</b> ${escapeHtml(scene.palette)}</span>
-        <span><b>Negative:</b> ${escapeHtml(scene.negative)}</span>
+        ${scene.summary ? `<span>${escapeHtml(scene.summary)}</span>` : ''}
+        ${highlights.length ? `<div class="placeholder-art-highlights">${highlights.map((item) => `<span class="mini-pill">${escapeHtml(item)}</span>`).join('')}</div>` : ''}
       </figcaption>
     </figure>
   `;
