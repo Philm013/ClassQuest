@@ -2,6 +2,15 @@ import { db, storage } from './db.js';
 import { summarizeStudent } from './gamification.js';
 import { PeerConnectionManager } from './peer.js';
 import { createDelta, createInitialState, generateId, generateClassCode, hydrateState, reduceState } from './state.js';
+import {
+  getQuestDifficulty,
+  getQuestStatusMeta,
+  getRankTitle,
+  getStudentAffinity,
+  getStudentTitle,
+  renderAvatarMedallion,
+  renderPlaceholderArtwork,
+} from './ui.js';
 
 function formatDateTime(value) {
   if (!value) return '—';
@@ -241,42 +250,45 @@ export class TeacherApp {
       : '<option value="">No saved sessions yet</option>';
     return `
       <section class="join-card">
-        <div class="hero">
-          <div>
+        <div class="hero hero-portal">
+          <div class="hero-copy">
             <p class="eyebrow">Teacher mode</p>
-            <h2>Set up a class quest in minutes.</h2>
-            <p>Start class quickly, admit students with one click, and keep progress organized with a simple classroom command center.</p>
+            <h2>Open your classroom guild hall.</h2>
+            <p>Spin up a game-master dashboard for lessons, badges, avatars, and collaborative class progression without adding setup friction.</p>
             <div class="hero-actions">
-              <button class="primary-button" type="button" data-action="demo-teacher">Open demo dashboard</button>
+              <button class="primary-button" type="button" data-action="demo-teacher">Open demo guild hall</button>
+            </div>
+            <div class="hero-token-row">
+              <span class="status-pill online">Quest-led lessons</span>
+              <span class="status-pill demo">Badge campaigns</span>
+              <span class="status-pill">Avatar metadata ready</span>
             </div>
           </div>
-          <div class="hero-panel">
-            <div class="hero-stat"><span>Class control</span><strong>Manage attendance, behavior, assignments, and goals from one place.</strong></div>
-            <div class="hero-stat"><span>Reliable sessions</span><strong>Resume from saved sessions or import a class backup.</strong></div>
-            <div class="hero-stat"><span>Real-time classroom</span><strong>Approve joins and push updates instantly to students.</strong></div>
+          <div class="hero-stage">
+            ${renderPlaceholderArtwork('teacher')}
           </div>
         </div>
         <div class="dashboard two-col">
           <section class="view-card">
-            <h3>Create a new session</h3>
+            <h3>Create a new campaign</h3>
             <form id="teacher-session-form" class="form-stack">
               <label><span>Class name</span><input class="field" name="className" type="text" value="Quest Academy" required /></label>
               <label><span>Period</span><input class="field" name="period" type="text" value="Period 1" required /></label>
               <div class="button-row">
-                <button class="primary-button" type="submit">Create Session</button>
+                <button class="primary-button" type="submit">Create Campaign</button>
               </div>
             </form>
           </section>
           <section class="view-card">
-            <h3>Restore a classroom</h3>
+            <h3>Restore a saved realm</h3>
             <div class="form-stack">
               <label><span>Saved sessions</span><select class="field" id="restore-session-select">${restoreOptions}</select></label>
               <div class="button-row">
-                <button class="secondary-button" type="button" data-action="restore-selected">Restore Selected</button>
+                <button class="secondary-button" type="button" data-action="restore-selected">Restore Realm</button>
                 <button class="ghost-button" type="button" data-action="import-session">Import Backup</button>
                 <button class="danger-button" type="button" data-action="recover-db">Recover DB</button>
               </div>
-              <p class="footer-note">Use recover only if local class data is corrupted. Import accepts JSON files exported from Session.</p>
+              <p class="footer-note">Use recover only if local class data is corrupted. Import accepts JSON files exported from an existing campaign.</p>
               <input class="sr-only" id="${this.importInputId}" type="file" accept="application/json" />
             </div>
           </section>
@@ -287,23 +299,43 @@ export class TeacherApp {
 
   renderDashboard() {
     const tabs = [
-      ['session', 'Session'],
-      ['roster', 'Roster'],
-      ['behavior', 'Behavior'],
-      ['assignments', 'Assignments'],
-      ['leaderboard', 'Leaderboard'],
-      ['goals', 'Goals'],
-      ['settings', 'Settings'],
+      ['session', 'Realm'],
+      ['roster', 'Party'],
+      ['behavior', 'Activity Log'],
+      ['assignments', 'Quest Board'],
+      ['leaderboard', 'Rankings'],
+      ['goals', 'World Goals'],
+      ['settings', 'Rules'],
     ];
+    const students = Object.values(this.state.students || {});
+    const totalXP = students.reduce((sum, student) => sum + (student.xp || 0), 0);
+    const badges = students.reduce((sum, student) => sum + (student.badges || []).length, 0);
     return `
       <section class="dashboard">
         <div class="dashboard-header">
           <div>
             <p class="eyebrow">Teacher dashboard</p>
             <h2>${escapeHtml(this.state.classInfo.name)} · ${escapeHtml(this.state.classInfo.period)}</h2>
-            <p class="muted">${Object.keys(this.state.students).length} students · Version ${this.state.version} · Auto-save active</p>
+            <p class="muted">${students.length} adventurers · Version ${this.state.version} · Auto-save active</p>
           </div>
           <div class="level-chip">Class Code <span>${escapeHtml(this.state.classInfo.code)}</span></div>
+        </div>
+        <div class="dashboard-grid">
+          <article class="metric-card feature-card">
+            <div class="metric-label">Guild roster</div>
+            <div class="metric-value">${students.length}</div>
+            <p class="muted">Connected students, approvals, and offline-safe snapshots all feed the same classroom campaign.</p>
+          </article>
+          <article class="metric-card feature-card">
+            <div class="metric-label">Total class XP</div>
+            <div class="metric-value">${totalXP}</div>
+            <p class="muted">Use this to frame your room as a shared progression arc instead of separate static tasks.</p>
+          </article>
+          <article class="metric-card feature-card">
+            <div class="metric-label">Badges unlocked</div>
+            <div class="metric-value">${badges}</div>
+            <p class="muted">Recognition, class rituals, and visible player identity now sit front and center.</p>
+          </article>
         </div>
         <div class="tab-row">
           ${tabs.map(([id, label]) => `<button class="tab-pill ${this.currentTab === id ? 'active' : ''}" type="button" data-tab="${id}">${label}</button>`).join('')}
@@ -356,7 +388,7 @@ export class TeacherApp {
         <section class="view-card">
           <div class="session-banner">
             <div>
-              <p class="muted">Share this code or QR link so students can join quickly.</p>
+              <p class="muted">Invite students into the realm with a code, QR portal, or shared guild link.</p>
               <div class="code-display">${escapeHtml(this.state.classInfo.code)}</div>
             </div>
             <div class="inline-actions">
@@ -370,12 +402,12 @@ export class TeacherApp {
               <div class="muted">${escapeHtml(joinUrl)}</div>
             </div>
             <div class="view-card">
-              <h3>Class details</h3>
+              <h3>Campaign details</h3>
               <div class="form-stack">
                 <label><span>Class name</span><input class="field" id="session-class-name" type="text" value="${escapeHtml(this.state.classInfo.name)}" /></label>
                 <label><span>Period</span><input class="field" id="session-period" type="text" value="${escapeHtml(this.state.classInfo.period)}" /></label>
                 <div class="button-row">
-                  <button class="primary-button" type="button" data-action="save-class-info">Save Details</button>
+                  <button class="primary-button" type="button" data-action="save-class-info">Save Realm Details</button>
                   <button class="ghost-button" type="button" data-action="broadcast-snapshot">Broadcast Snapshot</button>
                 </div>
               </div>
@@ -383,7 +415,27 @@ export class TeacherApp {
           </div>
         </section>
         <section class="view-card">
-          <h3>Join approvals</h3>
+          <h3>Realm staging</h3>
+          ${renderPlaceholderArtwork('teacher', {
+            title: 'Classroom Worldboard',
+            label: 'Realm Board',
+            prompt: 'classroom MMORPG command board with join portal, quest list, badge wall, and student avatars waiting in lobby',
+          })}
+          <div class="dashboard-grid compact-grid">
+            <div class="metric-card">
+              <div class="metric-label">Pending joins</div>
+              <div class="metric-value">${this.pendingJoins.length}</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-label">Active quests</div>
+              <div class="metric-value">${Object.values(this.state.assignments || {}).filter((assignment) => !assignment.archived).length}</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-label">World goals</div>
+              <div class="metric-value">${(this.state.goals || []).length}</div>
+            </div>
+          </div>
+          <h4>Join approvals</h4>
           ${pendingMarkup}
         </section>
       </div>
@@ -413,8 +465,9 @@ export class TeacherApp {
           const summary = summarizeStudent(selected);
           return `
             <div class="profile-card">
+              ${renderAvatarMedallion(selected)}
               <h3>${escapeHtml(selected.name)}</h3>
-              <p class="muted">${escapeHtml(selected.id)} · Last active ${formatDateTime(selected.lastActive)}</p>
+              <p class="muted">${escapeHtml(selected.id)} · ${escapeHtml(getStudentTitle(selected))} · Last active ${formatDateTime(selected.lastActive)}</p>
               <div class="stat-grid three-col">
                 <div class="metric-card"><div class="metric-label">XP</div><div class="metric-value">${summary.xp}</div></div>
                 <div class="metric-card"><div class="metric-label">Level</div><div class="metric-value">${summary.level}</div></div>
@@ -422,6 +475,7 @@ export class TeacherApp {
               </div>
               <div class="xp-bar-shell"><div class="xp-bar-fill" style="width:${summary.progress.percent}%"></div></div>
               <p class="muted">${summary.progress.toNextLevel} XP to the next level.</p>
+              <div class="info-banner"><strong>Affinity</strong><span>${escapeHtml(getStudentAffinity(selected))} · ${(selected.badges || []).length} collectible unlocks</span></div>
               <h4>Badges</h4>
               <div class="inline-actions">${(selected.badges || []).map((badgeId) => {
                 const badge = this.state.badges.find((item) => item.id === badgeId);
@@ -434,14 +488,14 @@ export class TeacherApp {
     return `
       <div class="roster-layout">
         <section class="view-card">
-          <h3>Live roster</h3>
+          <h3>Live party roster</h3>
           ${requestMarkup}
           <div class="roster-list">
             ${students.length ? students.sort((a, b) => b.xp - a.xp).map((student) => `
               <button class="list-row" type="button" data-action="select-student" data-student-id="${student.id}">
                 <div>
                   <div class="row-title">${escapeHtml(student.name)}</div>
-                  <div class="muted">${escapeHtml(student.id)}</div>
+                  <div class="muted">${escapeHtml(student.id)} · ${escapeHtml(getStudentTitle(student))}</div>
                 </div>
                 <div class="inline-actions">
                   <span class="status-pill ${student.connStatus === 'online' ? 'online' : 'offline'}"><span class="status-dot ${student.connStatus === 'online' ? 'online' : 'offline'}"></span>${escapeHtml(student.connStatus)}</span>
@@ -463,16 +517,16 @@ export class TeacherApp {
     return `
       <div class="two-col">
         <section class="view-card">
-          <h3>Log behavior</h3>
+          <h3>Log activity events</h3>
           <form id="behavior-form" class="form-stack">
             <div>
-              <span class="label">Select student(s)</span>
+              <span class="label">Select party members</span>
               <div class="card-grid">
                 ${students.length ? students.map((student) => `
                   <label class="list-row">
                     <div>
                       <div class="row-title">${escapeHtml(student.name)}</div>
-                      <div class="muted">${student.xp} XP · ${student.streak} streak</div>
+                      <div class="muted">${student.xp} XP · ${student.streak} streak · ${escapeHtml(getStudentAffinity(student))}</div>
                     </div>
                     <input type="checkbox" name="studentIds" value="${student.id}" />
                   </label>
@@ -485,11 +539,16 @@ export class TeacherApp {
               </select>
             </label>
             <label><span>Note</span><textarea name="note" placeholder="Optional context for this event"></textarea></label>
-            <div class="button-row"><button class="primary-button" type="submit">Apply Behavior Event</button></div>
+            <div class="button-row"><button class="primary-button" type="submit">Award Activity Event</button></div>
           </form>
         </section>
         <section class="view-card">
-          <h3>Recent behavior timeline</h3>
+          <h3>Recent classroom battle log</h3>
+          ${renderPlaceholderArtwork('badge', {
+            title: 'Activity FX Concepts',
+            label: 'UI FX',
+            prompt: 'classroom-safe burst effects for participation, teamwork, positive streaks, and badge unlocks in a fantasy school interface',
+          })}
           <div class="timeline-list">
             ${this.state.behaviorLog.length ? this.state.behaviorLog.slice(0, 18).map((event) => {
               const student = this.state.students[event.studentId];
@@ -513,57 +572,71 @@ export class TeacherApp {
     return `
       <div class="dashboard">
         <section class="view-card">
-          <h3>Create or edit assignments</h3>
+          <h3>Forge or edit lesson quests</h3>
           <form id="assignment-form" class="form-grid">
             <input type="hidden" name="assignmentId" id="assignment-id" />
-            <label><span>Title</span><input class="field" name="title" type="text" required /></label>
+            <label><span>Quest title</span><input class="field" name="title" type="text" required /></label>
             <label><span>Due date</span><input class="field" name="dueDate" type="date" required /></label>
-            <label class="span-2"><span>Description</span><textarea name="desc" required></textarea></label>
+            <label class="span-2"><span>Quest brief</span><textarea name="desc" required></textarea></label>
             <label><span>XP reward</span><input class="field" name="xpReward" type="number" min="0" value="50" required /></label>
             <label><span>Late penalty</span><input class="field" name="latePenalty" type="number" min="0" value="10" required /></label>
             <div class="span-2 button-row">
-              <button class="primary-button" type="submit">Save Assignment</button>
+              <button class="primary-button" type="submit">Save Quest</button>
               <button class="ghost-button" type="reset">Clear</button>
             </div>
           </form>
         </section>
         <section class="assignment-grid">
-          ${assignments.length ? assignments.map((assignment) => `
-            <article class="assignment-card">
-              <div class="inline-actions">
-                <h4>${escapeHtml(assignment.title)}</h4>
-                <span class="mini-pill">${assignment.xpReward} XP</span>
-              </div>
-              <p class="muted">Due ${formatDate(assignment.dueDate)} · Late penalty ${assignment.latePenalty} XP</p>
-              <p>${escapeHtml(assignment.desc)}</p>
-              <div class="button-row">
-                <button class="secondary-button" type="button" data-action="edit-assignment" data-assignment-id="${assignment.id}">Edit</button>
-                <button class="ghost-button" type="button" data-action="archive-assignment" data-assignment-id="${assignment.id}">Archive</button>
-              </div>
-              <table class="table-lite">
-                <thead><tr><th>Student</th><th>Status</th><th>Review</th></tr></thead>
-                <tbody>
-                  ${Object.values(this.state.students || {}).map((student) => {
-                    const status = assignment.studentStatuses?.[student.id] || 'assigned';
-                    return `
-                      <tr>
-                        <td>${escapeHtml(student.name)}</td>
-                        <td class="assign-status ${status}">${escapeHtml(status)}</td>
-                        <td>
-                          ${status === 'submitted'
-                            ? `<div class="inline-actions">
-                                <button class="primary-button" type="button" data-action="approve-submission" data-assignment-id="${assignment.id}" data-student-id="${student.id}">Approve</button>
-                                <button class="ghost-button" type="button" data-action="deny-submission" data-assignment-id="${assignment.id}" data-student-id="${student.id}">Deny</button>
-                              </div>`
-                            : '<span class="muted">—</span>'}
-                        </td>
-                      </tr>
-                    `;
-                  }).join('')}
-                </tbody>
-              </table>
-            </article>
-          `).join('') : '<div class="empty-state">No active assignments yet.</div>'}
+          ${assignments.length ? assignments.map((assignment) => {
+            const difficulty = getQuestDifficulty(assignment.xpReward);
+            return `
+              <article class="assignment-card quest-card ${difficulty.tone}">
+                ${renderPlaceholderArtwork('quest', {
+                  title: assignment.title,
+                  label: `${difficulty.label} Quest`,
+                  prompt: `lesson quest card for ${assignment.title}, classroom mission rewards, fantasy academy quest board, ${assignment.desc}`,
+                })}
+                <div class="quest-card-header">
+                  <div>
+                    <h4>${escapeHtml(assignment.title)}</h4>
+                    <p class="muted">Due ${formatDate(assignment.dueDate)} · Late penalty ${assignment.latePenalty} XP</p>
+                  </div>
+                  <div class="quest-reward-stack">
+                    <span class="mini-pill positive">${assignment.xpReward} XP</span>
+                    <span class="mini-pill quest-${difficulty.tone}">${difficulty.label}</span>
+                  </div>
+                </div>
+                <p>${escapeHtml(assignment.desc)}</p>
+                <div class="button-row">
+                  <button class="secondary-button" type="button" data-action="edit-assignment" data-assignment-id="${assignment.id}">Edit</button>
+                  <button class="ghost-button" type="button" data-action="archive-assignment" data-assignment-id="${assignment.id}">Archive</button>
+                </div>
+                <table class="table-lite">
+                  <thead><tr><th>Student</th><th>Status</th><th>Review</th></tr></thead>
+                  <tbody>
+                    ${Object.values(this.state.students || {}).map((student) => {
+                      const status = assignment.studentStatuses?.[student.id] || 'assigned';
+                      const statusMeta = getQuestStatusMeta(status);
+                      return `
+                        <tr>
+                          <td>${escapeHtml(student.name)}</td>
+                          <td><span class="assign-status ${statusMeta.tone}">${escapeHtml(statusMeta.label)}</span></td>
+                          <td>
+                            ${status === 'submitted'
+                              ? `<div class="inline-actions">
+                                  <button class="primary-button" type="button" data-action="approve-submission" data-assignment-id="${assignment.id}" data-student-id="${student.id}">Approve</button>
+                                  <button class="ghost-button" type="button" data-action="deny-submission" data-assignment-id="${assignment.id}" data-student-id="${student.id}">Deny</button>
+                                </div>`
+                              : '<span class="muted">—</span>'}
+                          </td>
+                        </tr>
+                      `;
+                    }).join('')}
+                  </tbody>
+                </table>
+              </article>
+            `;
+          }).join('') : '<div class="empty-state">No active lesson quests yet.</div>'}
         </section>
       </div>
     `;
@@ -574,13 +647,13 @@ export class TeacherApp {
     return `
       <div class="split-grid">
         <section class="view-card">
-          <h3>Leaderboard</h3>
+          <h3>Guild rankings</h3>
           <div class="leaderboard-list">
             ${ranked.length ? ranked.map((student, index) => `
               <div class="leaderboard-row ${index === 0 ? 'highlight' : ''}">
                 <div>
                   <div class="row-title">#${index + 1} · ${escapeHtml(student.name)}</div>
-                  <div class="muted">Level ${student.level} · ${student.streak} day streak</div>
+                  <div class="muted">${escapeHtml(getRankTitle(index))} · Level ${student.level} · ${student.streak} day streak</div>
                 </div>
                 <div class="inline-actions">
                   <span class="mini-pill">${student.xp} XP</span>
@@ -592,6 +665,11 @@ export class TeacherApp {
         </section>
         <section class="view-card">
           <h3>Reward store</h3>
+          ${renderPlaceholderArtwork('avatar', {
+            title: 'Class Reward Boutique',
+            label: 'Reward Shop',
+            prompt: 'classroom reward shop with cosmetic avatar unlocks, guild perks, reward tickets, magical school market board',
+          })}
           <div class="card-grid">
             ${(this.state.rewardStore || []).map((reward) => `
               <div class="metric-card">
@@ -609,13 +687,18 @@ export class TeacherApp {
     return `
       <div class="two-col">
         <section class="view-card">
-          <h3>Create collaborative goal</h3>
+          <h3>Create a world goal</h3>
           <form id="goal-form" class="form-stack">
             <label><span>Goal title</span><input class="field" name="title" type="text" placeholder="Reach 5000 XP" required /></label>
             <label><span>Target XP</span><input class="field" name="targetXP" type="number" min="1" value="5000" required /></label>
             <label><span>Unlock reward</span><input class="field" name="reward" type="text" placeholder="Movie day vote" required /></label>
             <div class="button-row"><button class="primary-button" type="submit">Add Goal</button></div>
           </form>
+          ${renderPlaceholderArtwork('quest', {
+            title: 'Collaborative Goal Banner',
+            label: 'World Event',
+            prompt: 'class-wide collaborative classroom event banner, students filling a giant XP crystal, school-safe fantasy teamwork scene',
+          })}
         </section>
         <section class="goal-grid">
           ${(this.state.goals || []).map((goal) => {
@@ -639,8 +722,8 @@ export class TeacherApp {
     return `
       <div class="settings-grid">
         <section class="view-card">
-          <h3>Class settings</h3>
-          <p class="muted">Tune XP pacing and streak flexibility so rules match your classroom style.</p>
+          <h3>Realm rules</h3>
+          <p class="muted">Tune XP pacing and streak flexibility so your classroom campaign matches the tone you want.</p>
           <form id="settings-form" class="form-stack">
             <label><span>Participation XP weight</span><input class="field" name="participationWeight" type="number" min="0" step="0.1" value="${this.state.settings.xpWeights.participation}" /></label>
             <label><span>Assignment XP weight</span><input class="field" name="assignmentWeight" type="number" min="0" step="0.1" value="${this.state.settings.xpWeights.assignments}" /></label>
@@ -661,13 +744,14 @@ export class TeacherApp {
         </section>
         <section class="view-card">
           <h3>Behavior categories & badges</h3>
-          <p class="muted">Create clear behavior signals and tune badge thresholds for meaningful recognition.</p>
+          <p class="muted">Create clear activity signals and tune badge thresholds for meaningful recognition.</p>
           <form id="category-form" class="form-grid">
             <label><span>Category name</span><input class="field" name="name" type="text" placeholder="Citizenship" required /></label>
             <label><span>Points</span><input class="field" name="points" type="number" value="10" required /></label>
             <label><span>Type</span><select class="field" name="isPositive"><option value="true">Positive</option><option value="false">Negative</option></select></label>
             <div class="button-row"><button class="secondary-button" type="submit">Add Category</button></div>
           </form>
+          ${renderPlaceholderArtwork('badge')}
           <div class="card-grid">
             ${this.state.behaviorCategories.map((category) => `<div class="metric-card"><div class="row-title">${escapeHtml(category.name)}</div><div class="muted">${category.points > 0 ? '+' : ''}${category.points} XP · ${category.isPositive ? 'Positive' : 'Negative'}</div></div>`).join('')}
           </div>
