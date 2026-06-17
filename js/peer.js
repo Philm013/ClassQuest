@@ -37,7 +37,7 @@ export class PeerConnectionManager extends EventTarget {
     this.classroomCode = code;
     this.setupBroadcastChannel();
     if (!window.Peer) {
-      return this.enableDemoMode('PeerJS unavailable - demo mode active.');
+      return this.enableDemoMode('PeerJS unavailable - local fallback mode active.');
     }
     try {
       await new Promise((resolve, reject) => {
@@ -64,7 +64,7 @@ export class PeerConnectionManager extends EventTarget {
     this.joinPayload = joinPayload;
     this.setupBroadcastChannel();
     if (!window.Peer) {
-      const result = this.enableDemoMode('PeerJS unavailable - trying local demo mode.');
+      const result = this.enableDemoMode('PeerJS unavailable - trying local fallback mode.');
       this.sendJoinRequest();
       return result;
     }
@@ -309,7 +309,7 @@ export class PeerConnectionManager extends EventTarget {
   enableDemoMode(message) {
     this.demoMode = true;
     this.hostOnline = this.role === 'teacher';
-    this.emit('status', { status: this.role === 'teacher' ? 'hosting' : 'demo', demoMode: true, message });
+    this.emit('status', { status: this.role === 'teacher' ? 'hosting' : 'local', demoMode: true, message });
     this.startPinging();
     return { demoMode: true, message };
   }
