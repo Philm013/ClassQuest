@@ -43,16 +43,16 @@ function renderLanding() {
     <section class="hero hero-portal">
       <div class="hero-copy">
         <p class="eyebrow">Welcome to ClassQuest</p>
-        <h2>Turn the classroom into a living MMORPG campaign.</h2>
-        <p>Launch guild-ready lessons, collectible badges, student avatars, and classroom quests from one browser-first world built for teachers and adventurers.</p>
+        <h2>Run classroom progress with one practical workspace.</h2>
+        <p>Manage behavior, assignments, and student growth in real time with a lightweight browser-first platform built for daily classroom use.</p>
         <div class="hero-actions">
-          <button class="primary-button" id="open-teacher" type="button">Enter Teacher Command</button>
-          <button class="secondary-button" id="open-student" type="button">Join the Guild</button>
+          <button class="primary-button" id="open-teacher" type="button">Open Teacher Workspace</button>
+          <button class="secondary-button" id="open-student" type="button">Open Student View</button>
         </div>
         <div class="hero-token-row">
-          <span class="status-pill online">Live classroom raids</span>
-          <span class="status-pill demo">Quest boards as lessons</span>
-          <span class="status-pill">Avatar progression</span>
+          <span class="status-pill online">Live classroom sync</span>
+          <span class="status-pill">Assignment lifecycle tracking</span>
+          <span class="status-pill">Student progress visibility</span>
         </div>
       </div>
       <div class="hero-stage">
@@ -63,35 +63,35 @@ function renderLanding() {
       <div class="dashboard-grid">
         <article class="metric-card feature-card">
           <span class="mini-pill positive">Teachers</span>
-          <h3>Game master your class</h3>
-          <p class="muted">Run behavior, quests, goals, and rewards from a board that feels closer to a guild hall than a grade spreadsheet.</p>
+          <h3>Manage class operations</h3>
+          <p class="muted">Track behavior, assignments, goals, and recognition from a streamlined daily dashboard.</p>
         </article>
         <article class="metric-card feature-card">
           <span class="mini-pill">Students</span>
-          <h3>Level through lessons</h3>
-          <p class="muted">See progress as quests, collect badges, and grow an avatar identity that makes school momentum visible.</p>
+          <h3>See progress clearly</h3>
+          <p class="muted">Students can follow current work, accomplishments, and momentum in one place.</p>
         </article>
         <article class="metric-card feature-card">
-          <span class="mini-pill">Classroom world</span>
-          <h3>Built for browser co-op</h3>
-          <p class="muted">Peer-to-peer sync, local snapshots, and low-friction joins keep the campaign moving during real class time.</p>
+          <span class="mini-pill">Classroom reliability</span>
+          <h3>Built for real class time</h3>
+          <p class="muted">Peer-to-peer sync, local snapshots, and quick joins keep workflows moving when schedules are tight.</p>
         </article>
       </div>
       <div class="three-col">
         <article class="view-card lore-card">
-          <p class="eyebrow">Realm loop</p>
-          <h3>Quest → reward → celebrate</h3>
-          <p class="muted">Assignments become missions, positive moments grant XP, and every class milestone looks like a visible unlock.</p>
+          <p class="eyebrow">Daily workflow</p>
+          <h3>Track, respond, and reinforce</h3>
+          <p class="muted">Capture classroom moments quickly and turn them into visible progress students can understand.</p>
         </article>
         <article class="view-card lore-card">
-          <p class="eyebrow">Placeholder art metadata</p>
-          <h3>Future-ready concept prompts</h3>
-          <p class="muted">Every major visual surface now carries structured prompt, lighting, framing, palette, and negative-prompt metadata for later image production.</p>
+          <p class="eyebrow">Class continuity</p>
+          <h3>Built-in resilience</h3>
+          <p class="muted">Offline-safe snapshots and restore options help protect class progress across interruptions.</p>
         </article>
         <article class="view-card lore-card">
-          <p class="eyebrow">Player fantasy</p>
-          <h3>School-safe classroom MMORPG</h3>
-          <p class="muted">The tone stays academic and welcoming while pushing harder on adventure, progression, parties, and collectible identity.</p>
+          <p class="eyebrow">Student engagement</p>
+          <h3>Motivation with structure</h3>
+          <p class="muted">Recognition, goals, and clear status cues keep the experience encouraging and academically focused.</p>
         </article>
       </div>
     </section>

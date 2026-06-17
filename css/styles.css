@@ -38,6 +38,7 @@ body {
 
 body {
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
 button,
@@ -125,6 +126,7 @@ button:hover {
   font-weight: 600;
   background: rgba(148, 163, 184, 0.14);
   color: var(--text);
+  max-width: 100%;
 }
 
 .status-pill.online,
@@ -314,6 +316,10 @@ button:hover {
 .dashboard-header {
   grid-template-columns: minmax(0, 1.2fr) auto;
   align-items: center;
+}
+
+.dashboard-header > * {
+  min-width: 0;
 }
 
 .dashboard-grid,
@@ -555,6 +561,10 @@ input:focus {
   padding: 10px;
 }
 
+.qr-card .muted {
+  overflow-wrap: anywhere;
+}
+
 .status-dot {
   width: 10px;
   height: 10px;
@@ -602,6 +612,7 @@ input:focus {
 .row-title {
   font-weight: 700;
   margin-bottom: 4px;
+  overflow-wrap: anywhere;
 }
 
 .xp-bar-shell {
@@ -623,11 +634,13 @@ input:focus {
   display: inline-flex;
   align-items: center;
   gap: 10px;
+  flex-wrap: wrap;
   padding: 12px 16px;
   border-radius: 16px;
   background: rgba(245, 158, 11, 0.14);
   color: #fde68a;
   font-size: 0.85rem;
+  max-width: 100%;
 }
 
 .badge-card.locked {
@@ -726,6 +739,12 @@ input:focus {
 .placeholder-art-meta strong,
 .placeholder-art-meta b {
   color: var(--text);
+}
+
+.placeholder-art-highlights {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .badge-grid > .placeholder-art,
@@ -1078,6 +1097,7 @@ input:focus {
 .join-card {
   max-width: 920px;
   margin: 0 auto;
+  width: 100%;
 }
 
 .quest-lobby {
@@ -1148,7 +1168,7 @@ input:focus {
 
 @media (max-width: 720px) {
   .app-shell {
-    width: min(100% - 20px, 1440px);
+    width: min(calc(100% - 20px), 1440px);
     padding-top: 16px;
   }
 
@@ -1156,11 +1176,18 @@ input:focus {
     padding: 16px;
     top: 10px;
     align-items: flex-start;
+    flex-direction: column;
   }
 
   .topbar-actions {
     width: 100%;
-    justify-content: space-between;
+    justify-content: stretch;
+    gap: 10px;
+  }
+
+  .topbar-actions > * {
+    width: 100%;
+    justify-content: center;
   }
 
   .hero,
@@ -1209,9 +1236,27 @@ input:focus {
     padding: 10px 12px;
   }
 
+  .status-pill,
+  .mini-pill {
+    white-space: normal;
+    text-align: center;
+    justify-content: center;
+  }
+
   .code-display {
     width: 100%;
     justify-content: center;
+  }
+
+  .table-lite {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .table-lite th,
+  .table-lite td {
+    min-width: 130px;
   }
 
   .avatar-medallion,
